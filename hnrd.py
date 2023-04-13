@@ -400,11 +400,12 @@ def getcrt():
                 print("  \_", colored(d, "cyan"))
                 try:
                     crtdata = future.result()
+
                     if len(crtdata) > 0:
+
                         certificates_result.append(
                             {
-                                "domain": d,
-                                "details": crtdata,
+                                d: crtdata,
                             }
                         )
                         for crtd in crtdata:
@@ -911,8 +912,7 @@ if __name__ == "__main__":
         scan_content = json.loads(result_file.read_text())
         collect_results.append(
             {
-                "scan": scan_name,
-                "scan_results": scan_content,
+                scan_name: scan_content,
             }
         )
         result_file.unlink(missing_ok=True)
