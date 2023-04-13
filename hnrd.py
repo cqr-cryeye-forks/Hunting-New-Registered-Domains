@@ -95,10 +95,23 @@ def get_DNS_record_results():
 
                 try:
                     DNSAdata = future.result()
+                    DNSAdata_2 = {}
+                    for dns_record_type, dns_record_details in DNSAdata.items():
+                        if dns_record_type == "A":
+                            DNSAdata_2["address_record_ipv4"] = dns_record_details
+                        elif dns_record_type == "AAAA":
+                            DNSAdata_2["address_record_ipv6"] = dns_record_details
+                        elif dns_record_type == "MX":
+                            DNSAdata_2["mail_exchanger_record"] = dns_record_details
+                        elif dns_record_type == "NS":
+                            DNSAdata_2["nameserver_record"] = dns_record_details
+                        elif dns_record_type == "SOA":
+                            DNSAdata_2["start_of_authority_record"] = dns_record_details
+
                     dns_result.append(
                         {
                             "domain": dom,
-                            "dns_details": DNSAdata,
+                            "dns_details": DNSAdata_2,
                         }
                     )
                     for k, v in DNSAdata.items():
