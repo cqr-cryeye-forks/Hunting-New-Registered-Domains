@@ -126,6 +126,14 @@ def get_DNS_record_results():
                     print(("%r generated an exception: %s" % (dom, exc)))
     except ValueError:
         pass
+
+    final_result_of_dns_scan: list[dict] = []
+
+    for collected_domain in dns_result:
+        if collected_domain in final_result_of_dns_scan:
+            c = 1
+        final_result_of_dns_scan.append(collected_domain)
+
     DNS_FILE.write_text(json.dumps(dns_result))
     return IPs
 
@@ -708,7 +716,7 @@ def subdomain(search_word):
 
 
 if __name__ == "__main__":
-    DOMAINS = []
+    DOMAINS = set()
     DOMAINS_DICT = {}
     IPs = []
     NAMES = []
@@ -810,7 +818,7 @@ if __name__ == "__main__":
                 DOMAINS_DICT[args.regex] = []
             if match:
                 DOMAINS_DICT[args.regex].append(domain)
-                DOMAINS.append(domain)
+                DOMAINS.add(domain)
 
         if os.path.exists("domain-names.txt"):
             os.remove("domain-names.txt")
@@ -833,7 +841,7 @@ if __name__ == "__main__":
                     match = re.search(r"^" + argssearch, row)
                     if match:
                         DOMAINS_DICT[key].append(row.strip("\r\n"))
-                        DOMAINS.append(row.strip("\r\n"))
+                        DOMAINS.add(row.strip("\r\n"))
 
     start = time.time()
 
