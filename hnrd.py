@@ -12,10 +12,10 @@ import time
 import warnings
 import zipfile
 
-import Levenshtein
+# import Levenshtein
 import dns.resolver
 import requests
-import tldextract
+# import tldextract
 import whois
 from bs4 import BeautifulSoup
 from colorama import init
