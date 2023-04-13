@@ -914,38 +914,38 @@ if __name__ == "__main__":
         result_file.unlink(missing_ok=True)
     FINAL_RESULT_FILE.write_text(json.dumps(collect_results))
 
-    print("[*]-Calculate Levenshtein Ratio")
-    for word, dlist in DOMAINS_DICT.items():
-        for domain in dlist:
-            ext_domain = tldextract.extract(domain)
-            LevWord1 = ext_domain.domain
-            LevWord2 = word
-            if Levenshtein.ratio(LevWord1, LevWord2) > 0.8:
-                print(
-                    "  \_",
-                    colored(LevWord1, "cyan"),
-                    "vs",
-                    colored(LevWord2, "cyan"),
-                    colored(Levenshtein.ratio(LevWord1, LevWord2), "red"),
-                )
-            if (
-                    Levenshtein.ratio(LevWord1, LevWord2) < 0.8
-                    and Levenshtein.ratio(LevWord1, LevWord2) > 0.4
-            ):
-                print(
-                    "  \_",
-                    colored(LevWord1, "cyan"),
-                    "vs",
-                    colored(LevWord2, "cyan"),
-                    colored(Levenshtein.ratio(LevWord1, LevWord2), "yellow"),
-                )
-            if Levenshtein.ratio(LevWord1, LevWord2) < 0.4:
-                print(
-                    "  \_",
-                    colored(LevWord1, "cyan"),
-                    "vs",
-                    colored(LevWord2, "cyan"),
-                    colored(Levenshtein.ratio(LevWord1, LevWord2), "green"),
-                )
+    # print("[*]-Calculate Levenshtein Ratio")
+    # for word, dlist in DOMAINS_DICT.items():
+    #     for domain in dlist:
+    #         ext_domain = tldextract.extract(domain)
+    #         LevWord1 = ext_domain.domain
+    #         LevWord2 = word
+    #         if Levenshtein.ratio(LevWord1, LevWord2) > 0.8:
+    #             print(
+    #                 "  \_",
+    #                 colored(LevWord1, "cyan"),
+    #                 "vs",
+    #                 colored(LevWord2, "cyan"),
+    #                 colored(Levenshtein.ratio(LevWord1, LevWord2), "red"),
+    #             )
+    #         if (
+    #                 Levenshtein.ratio(LevWord1, LevWord2) < 0.8
+    #                 and Levenshtein.ratio(LevWord1, LevWord2) > 0.4
+    #         ):
+    #             print(
+    #                 "  \_",
+    #                 colored(LevWord1, "cyan"),
+    #                 "vs",
+    #                 colored(LevWord2, "cyan"),
+    #                 colored(Levenshtein.ratio(LevWord1, LevWord2), "yellow"),
+    #             )
+    #         if Levenshtein.ratio(LevWord1, LevWord2) < 0.4:
+    #             print(
+    #                 "  \_",
+    #                 colored(LevWord1, "cyan"),
+    #                 "vs",
+    #                 colored(LevWord2, "cyan"),
+    #                 colored(Levenshtein.ratio(LevWord1, LevWord2), "green"),
+    #             )
 
     print((time.time() - start))
