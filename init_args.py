@@ -33,7 +33,7 @@ def init_argparse() -> argparse.Namespace:
 
     selection = parser.add_mutually_exclusive_group(required=True)
     selection.add_argument(
-        "-s", action="store", dest="search", help="Search a keyword", default=None
+        "-s", action="store", dest="search", help="Search a keyword", default=None, nargs="+"
     )
     selection.add_argument(
         "-S",
@@ -48,7 +48,8 @@ def init_argparse() -> argparse.Namespace:
 
     parser.add_argument("-v", action="version", version="%(prog)s v1.0")
     parser.add_argument("--output", help="path to output file")
-    args =parser.parse_args()
+    args = parser.parse_args()
     return args
+
 
 args = init_argparse()

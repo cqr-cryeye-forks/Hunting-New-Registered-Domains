@@ -768,13 +768,15 @@ if __name__ == "__main__":
             print("Error: need a file (-d) or a range of dates (-f [-t])")
             sys.exit()
     if args.search is not None:
-        bitsquatting_search = bitsquatting(args.search)
-        hyphenation_search = hyphenation(args.search)
-        subdomain_search = subdomain(args.search)
+        search = " ".join(args.search)
+        # bitsquatting_search = bitsquatting(args.search)
+        bitsquatting_search = bitsquatting(search)
+        hyphenation_search = hyphenation(search)
+        subdomain_search = subdomain(search)
         search_all = {
-            args.search: bitsquatting_search + hyphenation_search + subdomain_search
+            search: bitsquatting_search + hyphenation_search + subdomain_search
         }
-        search_all[args.search].append(args.search)
+        search_all[search].append(search)
     elif args.search_file is not None:
         try:
             with open(args.search_file, "r") as flist:
@@ -902,6 +904,8 @@ if __name__ == "__main__":
     SHANNON_ENTROPY_FILE.write_text(json.dumps(entropy_results))
 
     collect_results = []
+    if FINAL_RESULT_FILE.exists():
+        FINAL_RESULT_FILE.unlink()
     for result_file in RESULT_STORAGE.iterdir():
         scan_name = result_file.stem
         scan_content = json.loads(result_file.read_text())
