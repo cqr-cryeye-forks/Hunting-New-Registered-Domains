@@ -19,4 +19,4 @@ six==1.11.0
 termcolor==1.1.0
 # tldextract==2.2.0
 webencodings==0.5.1
-whois==0.9.27
+# whois==0.9.27

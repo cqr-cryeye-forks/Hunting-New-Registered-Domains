@@ -16,7 +16,7 @@ import zipfile
 import dns.resolver
 import requests
 # import tldextract
-import whois
+# import whois
 from bs4 import BeautifulSoup
 from colorama import init
 from termcolor import colored
@@ -134,71 +134,71 @@ def diff_dates(date1, date2):
     return abs((date2 - date1).days)
 
 
-def whois_domain(domain_name):
-    import time
-    import datetime
-
-    RES = {}
-
-    try:
-        w_res = whois.query(domain_name)
-        name = w_res.name
-        creation_date = w_res.creation_date
-        emails = w_res.emails
-        registrar = w_res.registrar
-        updated_date = w_res.last_updated
-        expiration_date = w_res.expiration_date
-
-        if (
-                isinstance(creation_date, datetime.datetime)
-                or isinstance(expiration_date, datetime.datetime)
-                or isinstance(updated_date, datetime.datetime)
-        ):
-            current_date = datetime.datetime.now()
-            res = diff_dates(current_date, creation_date)
-            RES.update(
-                {
-                    "creation_date": creation_date,
-                    "creation_date_diff": res,
-                    "emails": emails,
-                    "name": name,
-                    "registrar": registrar,
-                    "updated_date": updated_date,
-                    "expiration_date": expiration_date,
-                }
-            )
-
-        elif (
-                isinstance(creation_date, list)
-                or isinstance(expiration_date, list)
-                or isinstance(updated_date, list)
-        ):
-            creation_date = w_res.creation_date[0]
-            updated_date = w_res.last_updated[0]
-            expiration_date = w_res.expiration_date[0]
-            current_date = datetime.datetime.now()
-            res = diff_dates(current_date, creation_date)
-
-            RES.update(
-                {
-                    "creation_date": creation_date,
-                    "creation_date_diff": res,
-                    "emails": emails,
-                    "name": name,
-                    "registrar": registrar,
-                    "updated_date": updated_date,
-                    "expiration_date": expiration_date,
-                }
-            )
-
-        time.sleep(2)
-    except TypeError:
-        pass
-    except Exception:
-        print(colored("No match for domain: {}.".format(domain_name), "red"))
-    except AttributeError:
-        pass
-    return RES
+# def whois_domain(domain_name):
+#     import time
+#     import datetime
+#
+#     RES = {}
+#
+#     try:
+#         w_res = whois.query(domain_name)
+#         name = w_res.name
+#         creation_date = w_res.creation_date
+#         emails = w_res.emails
+#         registrar = w_res.registrar
+#         updated_date = w_res.last_updated
+#         expiration_date = w_res.expiration_date
+#
+#         if (
+#                 isinstance(creation_date, datetime.datetime)
+#                 or isinstance(expiration_date, datetime.datetime)
+#                 or isinstance(updated_date, datetime.datetime)
+#         ):
+#             current_date = datetime.datetime.now()
+#             res = diff_dates(current_date, creation_date)
+#             RES.update(
+#                 {
+#                     "creation_date": creation_date,
+#                     "creation_date_diff": res,
+#                     "emails": emails,
+#                     "name": name,
+#                     "registrar": registrar,
+#                     "updated_date": updated_date,
+#                     "expiration_date": expiration_date,
+#                 }
+#             )
+#
+#         elif (
+#                 isinstance(creation_date, list)
+#                 or isinstance(expiration_date, list)
+#                 or isinstance(updated_date, list)
+#         ):
+#             creation_date = w_res.creation_date[0]
+#             updated_date = w_res.last_updated[0]
+#             expiration_date = w_res.expiration_date[0]
+#             current_date = datetime.datetime.now()
+#             res = diff_dates(current_date, creation_date)
+#
+#             RES.update(
+#                 {
+#                     "creation_date": creation_date,
+#                     "creation_date_diff": res,
+#                     "emails": emails,
+#                     "name": name,
+#                     "registrar": registrar,
+#                     "updated_date": updated_date,
+#                     "expiration_date": expiration_date,
+#                 }
+#             )
+#
+#         time.sleep(2)
+#     except TypeError:
+#         pass
+#     except Exception:
+#         print(colored("No match for domain: {}.".format(domain_name), "red"))
+#     except AttributeError:
+#         pass
+#     return RES
 
 
 def IP2CIDR(ip):
@@ -239,86 +239,86 @@ def get_IP2CIDR():
     x = 1
 
 
-def get_WHOIS_results():
-    global NAMES
-    try:
-        with concurrent.futures.ThreadPoolExecutor(
-                max_workers=len(DOMAINS)
-        ) as executor:
-            future_to_whois_domain = {
-                executor.submit(whois_domain, domain): domain for domain in DOMAINS
-            }
-            for future in concurrent.futures.as_completed(future_to_whois_domain):
-                dwhois = future_to_whois_domain[future]
-                try:
-                    whois_data = future.result()
-                    if whois_data:
-                        for k, v in whois_data.items():
-                            if "creation_date" in k:
-                                cd = whois_data.get("creation_date")
-                            if "updated_date" in k:
-                                ud = whois_data.get("updated_date")
-                            if "expiration_date" in k:
-                                ed = whois_data.get("expiration_date")
-                            if "creation_date_diff" in k:
-                                cdd = whois_data.get("creation_date_diff")
-                            if "name" in k:
-                                name = whois_data.get("name")
-                            if "emails" in k:
-                                email = whois_data.get("emails")
-                            if "registrar" in k:
-                                reg = whois_data.get("registrar")
-
-                        if isinstance(email, list):
-                            print(
-                                "  \_",
-                                colored(dwhois, "cyan"),
-                                "\n    \_ Created Date",
-                                colored(cd, "yellow"),
-                                "\n    \_ Updated Date",
-                                colored(ud, "yellow"),
-                                "\n    \_ Expiration Date",
-                                colored(ed, "yellow"),
-                                "\n    \_ DateDiff",
-                                colored(cdd, "yellow"),
-                                "\n    \_ Name",
-                                colored(name, "yellow"),
-                                "\n    \_ Email",
-                                colored(",".join(email), "yellow"),
-                                "\n    \_ Registrar",
-                                colored(reg, "yellow"),
-                            )
-
-                            if isinstance(name, list):
-                                for n in name:
-                                    NAMES.append(n)
-                            else:
-                                NAMES.append(name)
-                        else:
-                            print(
-                                "  \_ ",
-                                colored(dwhois, "cyan"),
-                                "\n    \_ Created Date",
-                                colored(cd, "yellow"),
-                                "\n    \_ Updated Date",
-                                colored(ud, "yellow"),
-                                "\n    \_ Expiration Date",
-                                colored(ed, "yellow"),
-                                "\n    \_ DateDiff",
-                                colored(cdd, "yellow"),
-                                "\n    \_ Name",
-                                colored(name, "yellow"),
-                                "\n    \_ Email",
-                                colored(email, "yellow"),
-                                "\n    \_ Registrar",
-                                colored(reg, "yellow"),
-                            )
-
-                except Exception as exc:
-                    print(("%r generated an exception: %s" % (dwhois, exc)))
-    except ValueError:
-        pass
-    return NAMES
+# def get_WHOIS_results():
+#     global NAMES
+#     try:
+#         with concurrent.futures.ThreadPoolExecutor(
+#                 max_workers=len(DOMAINS)
+#         ) as executor:
+#             future_to_whois_domain = {
+#                 executor.submit(whois_domain, domain): domain for domain in DOMAINS
+#             }
+#             for future in concurrent.futures.as_completed(future_to_whois_domain):
+#                 dwhois = future_to_whois_domain[future]
+#                 try:
+#                     whois_data = future.result()
+#                     if whois_data:
+#                         for k, v in whois_data.items():
+#                             if "creation_date" in k:
+#                                 cd = whois_data.get("creation_date")
+#                             if "updated_date" in k:
+#                                 ud = whois_data.get("updated_date")
+#                             if "expiration_date" in k:
+#                                 ed = whois_data.get("expiration_date")
+#                             if "creation_date_diff" in k:
+#                                 cdd = whois_data.get("creation_date_diff")
+#                             if "name" in k:
+#                                 name = whois_data.get("name")
+#                             if "emails" in k:
+#                                 email = whois_data.get("emails")
+#                             if "registrar" in k:
+#                                 reg = whois_data.get("registrar")
+#
+#                         if isinstance(email, list):
+#                             print(
+#                                 "  \_",
+#                                 colored(dwhois, "cyan"),
+#                                 "\n    \_ Created Date",
+#                                 colored(cd, "yellow"),
+#                                 "\n    \_ Updated Date",
+#                                 colored(ud, "yellow"),
+#                                 "\n    \_ Expiration Date",
+#                                 colored(ed, "yellow"),
+#                                 "\n    \_ DateDiff",
+#                                 colored(cdd, "yellow"),
+#                                 "\n    \_ Name",
+#                                 colored(name, "yellow"),
+#                                 "\n    \_ Email",
+#                                 colored(",".join(email), "yellow"),
+#                                 "\n    \_ Registrar",
+#                                 colored(reg, "yellow"),
+#                             )
+#
+#                             if isinstance(name, list):
+#                                 for n in name:
+#                                     NAMES.append(n)
+#                             else:
+#                                 NAMES.append(name)
+#                         else:
+#                             print(
+#                                 "  \_ ",
+#                                 colored(dwhois, "cyan"),
+#                                 "\n    \_ Created Date",
+#                                 colored(cd, "yellow"),
+#                                 "\n    \_ Updated Date",
+#                                 colored(ud, "yellow"),
+#                                 "\n    \_ Expiration Date",
+#                                 colored(ed, "yellow"),
+#                                 "\n    \_ DateDiff",
+#                                 colored(cdd, "yellow"),
+#                                 "\n    \_ Name",
+#                                 colored(name, "yellow"),
+#                                 "\n    \_ Email",
+#                                 colored(email, "yellow"),
+#                                 "\n    \_ Registrar",
+#                                 colored(reg, "yellow"),
+#                             )
+#
+#                 except Exception as exc:
+#                     print(("%r generated an exception: %s" % (dwhois, exc)))
+#     except ValueError:
+#         pass
+#     return NAMES
 
 
 def EmailDomainBigData(name):
@@ -839,8 +839,8 @@ if __name__ == "__main__":
     print("[*]-Retrieving IP2ASN Information")
     get_IP2CIDR()
 
-    print("[*]-Retrieving WHOIS Information")
-    get_WHOIS_results()
+    # print("[*]-Retrieving WHOIS Information")
+    # get_WHOIS_results()
 
     print(
         "[*]-Retrieving Reverse WHOIS (by Name) Information [Source https://domainbigdata.com]"
