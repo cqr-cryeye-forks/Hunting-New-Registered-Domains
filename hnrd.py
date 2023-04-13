@@ -405,7 +405,8 @@ def getcrt():
 
                         certificates_result.append(
                             {
-                                d: crtdata,
+                                "domain": d,
+                                "details": crtdata,
                             }
                         )
                         for crtd in crtdata:
