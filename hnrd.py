@@ -22,7 +22,7 @@ from colorama import init
 from termcolor import colored
 
 from config import DNS_FILE, IP2ASN_FILE, CERTIFICATES_FILE, VIRUS_TOTAL_FILE, QUAD9_FILE, SHANNON_ENTROPY_FILE, \
-    RESULT_STORAGE, FINAL_RESULT_FILE
+    FINAL_RESULT_FILE, RESULTS_OF_SCAN_STORAGE
 from init_args import args
 
 init()
@@ -904,18 +904,15 @@ if __name__ == "__main__":
             print("  \_", colored(domain, "cyan"), shannon_entropy(domain))
     SHANNON_ENTROPY_FILE.write_text(json.dumps(entropy_results))
 
-    collect_results = []
-    if FINAL_RESULT_FILE.exists():
-        FINAL_RESULT_FILE.unlink()
-    for result_file in RESULT_STORAGE.iterdir():
+    collect_results = {}
+
+    for result_file in RESULTS_OF_SCAN_STORAGE.iterdir():
         scan_name = result_file.stem
         scan_content = json.loads(result_file.read_text())
-        collect_results.append(
-            {
-                scan_name: scan_content,
-            }
-        )
+        collect_results[scan_name] = scan_content
         result_file.unlink(missing_ok=True)
+
+    RESULTS_OF_SCAN_STORAGE.rmdir()
     FINAL_RESULT_FILE.write_text(json.dumps(collect_results))
 
     # print("[*]-Calculate Levenshtein Ratio")
