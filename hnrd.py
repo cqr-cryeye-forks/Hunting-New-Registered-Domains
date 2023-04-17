@@ -458,10 +458,10 @@ def getVTDomainReport():
                 try:
                     vtdata = future.result()
                     analis_results: dict[str, dict] = vtdata['data']['attributes']['last_analysis_results']
-                    not_clean_antivirus_analize: dict = {}
+                    not_clean_antivirus_analize: list[dict] = []
                     for antivirus_name, antivirus_details in analis_results.items():
                         if antivirus_details["result"] != "clean":
-                            not_clean_antivirus_analize[antivirus_name] = antivirus_details
+                            not_clean_antivirus_analize.append(antivirus_details)
 
                     if not_clean_antivirus_analize:
                         virus_total_results.append(
