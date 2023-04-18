@@ -872,6 +872,8 @@ if __name__ == "__main__":
     entropy_results: list[dict] = []
     for domain in DOMAINS:
         entropy_level: float = shannon_entropy(domain)
+        entropy_level: float = round(entropy_level, 3)
+
         if shannon_entropy(domain) > 4:
             entropy_results.append(
                 {
