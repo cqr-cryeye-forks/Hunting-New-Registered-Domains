@@ -392,7 +392,7 @@ def crt(domain_name):
         "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.10; rv:52.0) Gecko/20100101 Firefox/52.0",
         "content-type": "application/json",
     }
-    response = requests.get("https://crt.sh/?", params=parameters, headers=headers)
+    response = requests.get("https://crt.sh/?", params=parameters, headers=headers, timeout=5)
     content = response.content.decode("utf-8")
     return json.loads("{}".format(content.replace("}{", "},{")))
 
