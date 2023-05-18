@@ -1,6 +1,5 @@
 from __future__ import print_function
 
-import base64
 import concurrent.futures
 import datetime
 import json
@@ -10,7 +9,6 @@ import re
 import sys
 import time
 import warnings
-import zipfile
 
 # import Levenshtein
 import dns.resolver
@@ -21,9 +19,10 @@ from bs4 import BeautifulSoup
 from colorama import init
 from termcolor import colored
 
-from config import DNS_FILE, IP2ASN_FILE, CERTIFICATES_FILE, VIRUS_TOTAL_FILE, QUAD9_FILE, SHANNON_ENTROPY_FILE, \
-    FINAL_RESULT_FILE, RESULTS_OF_SCAN_STORAGE
-from init_args import args
+from app.config import DNS_FILE, IP2ASN_FILE, CERTIFICATES_FILE, VIRUS_TOTAL_FILE, QUAD9_FILE, SHANNON_ENTROPY_FILE, \
+    RESULTS_OF_SCAN_STORAGE, RESULT_STORAGE
+from app.download_nrd import download_nrd
+from app.init_args import args
 
 init()
 
@@ -635,35 +634,6 @@ def shannon_entropy(domain):
     return ent
 
 
-def download_nrd(d):
-    if not os.path.isfile(d + ".zip"):
-        b64 = base64.b64encode((d + ".zip").encode("ascii"))
-        nrd_zip = "https://www.whoisds.com//whois-database/newly-registered-domains/{}/nrd".format(
-            b64.decode("ascii")
-        )
-        try:
-            resp = requests.get(nrd_zip, stream=True)
-
-            print(
-                "Downloading File {} - Size {}...".format(
-                    d + ".zip", resp.headers["Content-length"]
-                )
-            )
-            if resp.headers["Content-length"]:
-                with open(d + ".zip", "wb") as f:
-                    for data in resp.iter_content(chunk_size=1024):
-                        f.write(data)
-                try:
-                    zip = zipfile.ZipFile(d + ".zip")
-                    zip.extractall()
-                except:
-                    print("File is not a zip file.")
-                    sys.exit()
-        except:
-            print("File {}.zip does not exist on the remote server.".format(d))
-            sys.exit()
-
-
 def download_nrds_from_to(date_from, date_to):
     d = "{}-{:02}-{:02}"
     date_i = date_from
@@ -671,7 +641,7 @@ def download_nrds_from_to(date_from, date_to):
         date_str = d.format(date_i.year, date_i.month, date_i.day)
         download_nrd(date_str)
         try:
-            f = open(date_str + ".txt", "r")
+            f = open(f"{date_str}.txt", "r")
         except:
             try:
                 f = open("domain-names.txt", "r")
@@ -715,12 +685,7 @@ def subdomain(search_word):
     return out
 
 
-if __name__ == "__main__":
-    DOMAINS = set()
-    DOMAINS_DICT = {}
-    IPs = []
-    NAMES = []
-
+def main():
     regexd = re.compile("([\d]{4})-([\d]{1,2})-([\d]{1,2})$")
     if args.date is not None:
         matchObj = re.match(regexd, args.date)
@@ -918,13 +883,15 @@ if __name__ == "__main__":
     collect_results = {}
 
     for result_file in RESULTS_OF_SCAN_STORAGE.iterdir():
+        if result_file.suffix != ".json":
+            continue
         scan_name = result_file.stem
         scan_content = json.loads(result_file.read_text())
         collect_results[scan_name] = scan_content
         result_file.unlink(missing_ok=True)
 
-    RESULTS_OF_SCAN_STORAGE.rmdir()
-    FINAL_RESULT_FILE.write_text(json.dumps(collect_results))
+    final_result_file = RESULT_STORAGE.joinpath(args.output)
+    final_result_file.write_text(json.dumps(collect_results))
 
     # print("[*]-Calculate Levenshtein Ratio")
     # for word, dlist in DOMAINS_DICT.items():
@@ -961,3 +928,12 @@ if __name__ == "__main__":
     #             )
 
     print((time.time() - start))
+
+
+if __name__ == "__main__":
+    DOMAINS = set()
+    DOMAINS_DICT = {}
+    IPs = []
+    NAMES = []
+
+    main()

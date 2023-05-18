@@ -1,0 +1,8 @@
+/files/*
+!/files/.gitkeep
+
+/result_storage/*
+!/result_storage/.gitkeep
+
+/result_of_scan_storage/*
+!/result_of_scan_storage/.gitkeep
