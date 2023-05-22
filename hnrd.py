@@ -639,7 +639,9 @@ def download_nrds_from_to(date_from, date_to):
     date_i = date_from
     while date_i <= date_to:
         date_str = d.format(date_i.year, date_i.month, date_i.day)
-        download_nrd(date_str)
+        date_i = date_i + datetime.timedelta(days=1)
+        if not download_nrd(date_str):
+            continue
         try:
             f = open(f"{date_str}.txt", "r")
         except:
@@ -651,7 +653,6 @@ def download_nrds_from_to(date_from, date_to):
         with open("domain-names.tmp", "a") as fout:
             for row in f:
                 fout.write(row)
-        date_i = date_i + datetime.timedelta(days=1)
 
     os.rename("domain-names.tmp", "domain-names.txt")
 
